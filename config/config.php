@@ -3,14 +3,14 @@
 return [
     'generator' => [],
     'creator' => [
-        'namespace' => 'PlugNPlay\Plugins',
+        'namespace' => 'PlugNPlay\\Plugins',
 
         'files' => [
             'composer' => ['composer.stub', 'composer.json'],
-            'config' => ['config/config.stub', 'config/config.php', 'rename'],
-            'command' => ['Commands/StubCommand.php', 'Commands/StubCommand.php', 'rename'],
-            'routes' => ['routes/web.php', 'routes/web.php'],
-            'lang' => ['resources/lang/en/labels.stub', 'resources/lang/en/labels.php'],
+            'config' => ['config.stub', 'config/config.php', 'rename'],
+            'command' => ['command.stub', 'Commands/StubCommand.php', 'rename'],
+            'routes' => ['routes.stub', 'routes/web.php'],
+            'lang' => ['labels.stub', 'resources/lang/en/labels.php'],
         ],
 
         'composer' => [

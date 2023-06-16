@@ -88,7 +88,7 @@ class PlugNPlayCommand extends Command
 
         $config = config('plug-n-play.creator');
 
-        $namespace = $config['namespace'];
+        $namespace = str(array_keys($this->composer->get('autoload.psr-4'))[1])->replaceLast('\\', '');
         $str = str($pluginName);
         $pluginNamePlural = $str->plural();
         $pluginNameLower = $str->lower();
@@ -130,9 +130,9 @@ class PlugNPlayCommand extends Command
 
         $config = config('plug-n-play.creator');
 
-        $stubs_path = $config['stubs']['path'];
+        $stubs_path = __DIR__.'/stubs';
 
-        $files_list = $config['plugin']['files'];
+        $files_list = $config['files'];
 
         foreach ($files_list as $file => $file_path) {
             $content_stub = File::get("$stubs_path/" . $file_path[0]);

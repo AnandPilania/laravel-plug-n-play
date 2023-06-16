@@ -1,0 +1,30 @@
+<?php
+
+namespace {{namespace}}\{{pluginName}}\Commands;
+
+use Illuminate\Console\Command;
+
+class {{pluginName}}Command extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'command:{{pluginName}}Command';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = '{{pluginName}} Command description';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(): int
+    {
+        return Command::SUCCESS;
+    }
+}
