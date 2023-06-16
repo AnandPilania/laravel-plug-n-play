@@ -5,6 +5,7 @@ namespace PlugNPlay;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider as Base;
 use Illuminate\Support\Str;
+use PlugNPlay\Commands\PlugNPlayCommand;
 use PlugNPlay\Contracts\PluginInterface;
 
 class ServiceProvider extends Base
@@ -13,7 +14,7 @@ class ServiceProvider extends Base
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', self::NAME);
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', self::NAME);
 
         $this->loadPlugins();
 
@@ -26,18 +27,18 @@ class ServiceProvider extends Base
 
     private function loadPlugins()
     {
-        $pluginsPath = __DIR__.'/../plugins';
+        $pluginsPath = __DIR__ . '/../plugins';
 
-        $pluginDirectories = glob($pluginsPath.'/*', GLOB_ONLYDIR);
+        $pluginDirectories = glob($pluginsPath . '/*', GLOB_ONLYDIR);
 
         $loadedPlugins = [];
 
         foreach ($pluginDirectories as $pluginDirectory) {
             $pluginName = basename($pluginDirectory);
 
-            $pluginClass = 'PlugNPlay\\Plugins\\'.$pluginName.'\\Plugin';
+            $pluginClass = 'PlugNPlay\\Plugins\\' . $pluginName . '\\Plugin';
 
-            if (! class_exists($pluginClass)) {
+            if (!class_exists($pluginClass)) {
                 continue;
             }
 
@@ -50,12 +51,12 @@ class ServiceProvider extends Base
     protected function loadPluginWithDependencies($pluginInstance, string $pluginName, array &$loadedPlugins): void
     {
         if (file_exists($pluginConfig = $pluginInstance->getConfig())) {
-            config([self::NAME.'.plugins.'.$pluginInstance->getName() => include $pluginConfig]);
+            config([self::NAME . '.plugins.' . $pluginInstance->getName() => include $pluginConfig]);
         }
 
         if (
-            ! $pluginInstance instanceof PluginInterface
-            || ! $pluginInstance->isEnabled($pluginName)
+            !$pluginInstance instanceof PluginInterface
+            || !$pluginInstance->isEnabled($pluginName)
             || in_array($pluginName, $loadedPlugins, true)
         ) {
             return;
@@ -64,9 +65,9 @@ class ServiceProvider extends Base
         $isDependencyResolved = true;
 
         foreach ($pluginInstance->getParentPlugin() as $dependency) {
-            $dependencyClass = 'PlugNPlay\\Plugins\\'.$dependency.'\\Plugin';
+            $dependencyClass = 'PlugNPlay\\Plugins\\' . $dependency . '\\Plugin';
 
-            if (! class_exists($dependencyClass)) {
+            if (!class_exists($dependencyClass)) {
                 $errorMessage = $this->getDependencyErrorMessage($pluginInstance);
                 session()->flash('plugin_error', $errorMessage);
 
@@ -78,12 +79,12 @@ class ServiceProvider extends Base
             $dependencyInstance = app($dependencyClass);
 
             if (file_exists($pluginConfig = $dependencyInstance->getConfig())) {
-                config([self::NAME.'.plugins.'.$dependencyInstance->getName() => include $pluginConfig]);
+                config([self::NAME . '.plugins.' . $dependencyInstance->getName() => include $pluginConfig]);
             }
 
             if (
-                ! $dependencyInstance instanceof PluginInterface
-                || ! $dependencyInstance->isEnabled($dependency)
+                !$dependencyInstance instanceof PluginInterface
+                || !$dependencyInstance->isEnabled($dependency)
             ) {
                 $isDependencyResolved = false;
 
@@ -109,20 +110,20 @@ class ServiceProvider extends Base
         $missingDependencies = [];
 
         foreach ($dependencies as $dependency) {
-            $dependencyClass = 'PlugNPlay\\Plugins\\'.$dependency.'\\Plugin';
+            $dependencyClass = 'PlugNPlay\\Plugins\\' . $dependency . '\\Plugin';
 
-            if (! class_exists($dependencyClass)) {
+            if (!class_exists($dependencyClass)) {
                 $missingDependencies[] = $dependency;
             }
         }
 
-        return 'Plugin "'.$pluginName.'" is disabled due to missing dependencies: '.implode(', ', $missingDependencies);
+        return 'Plugin "' . $pluginName . '" is disabled due to missing dependencies: ' . implode(', ', $missingDependencies);
     }
 
     protected function loadPluginFiles(PluginInterface $pluginInstance): void
     {
         if ($pluginLang = $pluginInstance->getLang()) {
-            $this->loadTranslationsFrom($pluginLang, (self::NAME.'.'.$pluginInstance->getName()));
+            $this->loadTranslationsFrom($pluginLang, (self::NAME . '.' . $pluginInstance->getName()));
         }
 
         if (file_exists($pluginRoutes = $pluginInstance->getRoutes())) {
@@ -134,7 +135,7 @@ class ServiceProvider extends Base
         }
 
         if (file_exists($pluginViews = $pluginInstance->getViews())) {
-            $this->loadViewsFrom($pluginViews, (self::NAME.'.'.$pluginInstance->getName()));
+            $this->loadViewsFrom($pluginViews, (self::NAME . '.' . $pluginInstance->getName()));
         }
 
         if ($pluginMenu = $pluginInstance->getMenuItems()) {
@@ -145,17 +146,22 @@ class ServiceProvider extends Base
     protected function extendMenuRecursively(PluginInterface $plugin, array &$pluginMenu): void
     {
         foreach (Arr::wrap($plugin->getParentPlugin() ?? []) as $parentPlugin) {
-            if ($parentMenu = config(self::NAME.'.menu.'.$parentPlugin)) {
+            if ($parentMenu = config(self::NAME . '.menu.' . $parentPlugin)) {
                 //$pluginMenu += $parentMenu;
                 //$this->extendMenuRecursively($parentPlugin, $pluginMenu);
             }
         }
 
-        config([self::NAME.'.menu.'.$plugin->getName() => ($pluginMenu + config()->get(self::NAME.'.menu.'.$plugin->getName(), []))]);
+        config([self::NAME . '.menu.' . $plugin->getName() => ($pluginMenu + config()->get(self::NAME . '.menu.' . $plugin->getName(), []))]);
     }
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PlugNPlayCommand::class,
+            ]);
+        }
     }
 
     public function provides(): array

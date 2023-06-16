@@ -2,6 +2,7 @@
 
 namespace PlugNPlay\Commands\Generator;
 
+use PlugNPlay\Actions\GetComposer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -32,7 +33,7 @@ abstract class GeneratorCommand
 
     public function __construct()
     {
-        $this->composer = new Composer();
+        $this->composer = new GetComposer();
     }
 
     /**
