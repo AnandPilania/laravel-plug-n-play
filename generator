@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+require 'vendor/autoload.php';
+
+use PlugNPlay\Commands\Generator\{MakeCommand, MakeEvent, MakeJob, MakeNotification, MakeRequest, MakeRule};
+use Silly\Application;
+
+$version = '0.0.1';
+
+$app = new Application('PlugNPlay Generator', $version);
+
+$app->command('make:command plugin name [--command=] [--force]', new MakeCommand);
+$app->command('make:request plugin name [--force]', new MakeRequest);
+$app->command('make:job plugin name [--sync] [--force]', new MakeJob);
+$app->command('make:event plugin name [--force]', new MakeEvent);
+$app->command('make:notification plugin name [--force]', new MakeNotification);
+$app->command('make:rule plugin name [--force]', new MakeRule);
+
+$app->run();

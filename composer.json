@@ -1,0 +1,69 @@
+{
+    "name": "anandpilania/laravel-plug-n-play",
+    "description": "...",
+    "version": "0.0.1",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Anand Pilania",
+            "email": "pilaniaanand@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "composer-plugin-api": "^2.3",
+        "laravel/framework": "^10.0",
+        "mnapoli/silly": "^1.8"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0",
+        "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0",
+        "laravel/pint": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "PlugNPlay\\": "src/",
+            "PlugNPlay\\Plugins\\": "plugins/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PlugNPlay\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "class": "PlugNPlay\\ComposerPluginApi\\ComposerPlugin",
+        "plugins-dir": "plugins",
+        "laravel": {
+            "providers": [
+                "PlugNPlay\\ServiceProvider"
+            ],
+            "aliases": {
+                "PlugNPlay": "PlugNPlay\\Facade"
+            }
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "lint": "pint",
+        "test:lint": "pint --test",
+        "test:unit": "pest --colors=always",
+        "test": [
+            "@test:lint",
+            "@test:unit"
+        ]
+    },
+    "bin": [
+        "generator"
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
